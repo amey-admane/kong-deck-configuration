@@ -1,7 +1,7 @@
 _format_version: "1.1"
 services:
   - name: grafana-service
-    host: internal-grafana-internal-alb-167603464.eu-central-1.elb.amazonaws.com
+    host: grafana-internal-alb.amazonaws.com
     port: 443
     protocol: https
     path: /

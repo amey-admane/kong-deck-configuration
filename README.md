@@ -13,7 +13,7 @@ This repository contains Kong Gateway configuration files for managing API gatew
 
 ### Grafana Service
 - **Name**: `grafana-service` 
-- **Host**: `internal-grafana-internal-alb-167603464.eu-central-1.elb.amazonaws.com`
+- **Host**: `grafana-internal-alb.amazonaws.com`
 - **Protocol**: HTTPS
 - **Port**: 443
 
