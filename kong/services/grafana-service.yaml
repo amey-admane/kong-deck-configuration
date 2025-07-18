@@ -1,0 +1,13 @@
+_format_version: "1.1"
+services:
+  - name: grafana-service
+    host: internal-grafana-internal-alb-167603464.eu-central-1.elb.amazonaws.com
+    port: 443
+    protocol: https
+    path: /
+    connect_timeout: 60000
+    read_timeout: 60000
+    write_timeout: 60000
+    retries: 5
+    tags:
+      - grafana

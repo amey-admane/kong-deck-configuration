@@ -1,0 +1,82 @@
+_format_version: "1.1"
+routes:
+  - name: fleet-list
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - GET
+    paths:
+      - /api/v1/fleet/assets
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: fleet-asset-details
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - GET
+    paths:
+      - ~/api/v1/fleet/assets/[^/]+
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: fleet-asset-create
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - POST
+    paths:
+      - /api/v1/fleet/assets
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: fleet-asset-update
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - PUT
+      - PATCH
+    paths:
+      - ~/api/v1/fleet/assets/[^/]+
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: fleet-asset-delete
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - DELETE
+    paths:
+      - ~/api/v1/fleet/assets/[^/]+
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false

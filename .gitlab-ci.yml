@@ -1,0 +1,133 @@
+
+variables:
+  KONG_ADMIN_URL: "https://<your-kong-admin-url>.com:8001"
+  DECK_VERSION: "1.8.2"
+  S3_BACKUP_BUCKET: "backups-eu-central-1"
+  AWS_DEFAULT_REGION: "eu-central-1"
+
+stages:
+  - validate
+  - verify
+  - backup
+  - deploy
+
+.deck-commands: &deck-commands
+  image: alpine:latest
+  before_script:
+    - |
+      # Install required packages
+      apk add --no-cache curl tar jq yq aws-cli
+
+      # Install deck
+      curl -sL https://github.com/kong/deck/releases/download/v${DECK_VERSION}/deck_${DECK_VERSION}_linux_amd64.tar.gz -o deck.tar.gz
+      tar -xf deck.tar.gz
+      mv deck /usr/local/bin/
+      chmod +x /usr/local/bin/deck
+
+      # Configure deck
+      export DECK_KONG_ADDR=$KONG_ADMIN_URL
+
+validate:
+  stage: validate
+  extends: .deck-commands
+  script:
+    - |
+      echo "Using pre-generated Kong configuration..."
+      # Note: kong.yaml is now generated locally using PowerShell script and committed to repo
+      # sh kong/merge-kong-config.sh
+      echo "Validating Kong configuration..."
+      deck validate -s kong/kong.yaml
+      cat kong/kong.yaml
+      
+verify:
+  stage: verify
+  extends: .deck-commands
+  script:
+    - |
+      echo "Using pre-generated Kong configuration..."
+      # sh kong/merge-kong-config.sh
+      echo "Checking differences between current and new configuration..."
+      deck diff -s kong/kong.yaml || true
+
+backup:
+  stage: backup
+  image: { name: "amazon/aws-cli:latest", entrypoint: [""] }
+  before_script:
+    
+    - |
+      # Install required packages for deck
+      yum update -y
+      yum install -y --allowerasing curl tar gzip
+
+      # Install deck
+      curl -sL https://github.com/kong/deck/releases/download/v${DECK_VERSION}/deck_${DECK_VERSION}_linux_amd64.tar.gz -o deck.tar.gz
+      tar -xf deck.tar.gz
+      mv deck /usr/local/bin/
+      chmod +x /usr/local/bin/deck
+
+      # Configure deck
+      export DECK_KONG_ADDR=$KONG_ADMIN_URL
+  needs: [validate, verify]
+  script:
+    - |
+      echo "Using pre-generated Kong configuration..."
+      # sh kong/merge-kong-config.sh
+      echo "Creating backup of current Kong configuration..."
+      
+      # Generate timestamp for backup naming
+      BACKUP_TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
+      BACKUP_DATE=$(date '+%Y-%m-%d')
+      
+      # Create backup directory structure
+      mkdir -p backups/${BACKUP_DATE}
+      
+      # Export current Kong configuration
+      echo "Exporting current Kong configuration..."
+      deck dump --output-file backups/${BACKUP_DATE}/kong-config-${BACKUP_TIMESTAMP}.yaml
+      
+      # Create a metadata file with backup information
+      cat > backups/${BACKUP_DATE}/backup-metadata-${BACKUP_TIMESTAMP}.json << EOF
+      {
+        "backup_timestamp": "${BACKUP_TIMESTAMP}",
+        "backup_date": "${BACKUP_DATE}",
+        "gitlab_commit": "${CI_COMMIT_SHA}",
+        "gitlab_branch": "${CI_COMMIT_BRANCH}",
+        "gitlab_pipeline": "${CI_PIPELINE_ID}",
+        "kong_admin_url": "${KONG_ADMIN_URL}",
+        "environment": "${CI_ENVIRONMENT_NAME}",
+        "backup_type": "pre-deployment"
+      }
+      EOF
+      
+      # Upload to S3
+      echo "Uploading backup to S3 bucket: ${S3_BACKUP_BUCKET}"
+      aws s3 cp backups/ "s3://${S3_BACKUP_BUCKET}/kong_configuration_file/" --recursive
+      
+      echo "Backup completed successfully!"
+      echo "Backup location: s3://${S3_BACKUP_BUCKET}/kong_configuration_file/${BACKUP_DATE}/"
+      
+      # List recent backups
+      echo "Recent backups in S3:"
+      aws s3 ls "s3://${S3_BACKUP_BUCKET}/kong_configuration_file/" --recursive | tail -10
+  artifacts:
+    paths:
+      - backups/
+    expire_in: 7 days
+  when: manual
+
+deploy:
+  stage: deploy
+  extends: .deck-commands
+  needs: 
+    - validate
+    - verify
+  script:
+    - |
+      echo "Using pre-generated Kong configuration..."
+      # sh kong/merge-kong-config.sh
+      echo "Deploying to Kong..."
+      deck sync -s kong/kong.yaml
+      echo "Verifying deployment..."
+      deck diff -s kong/kong.yaml
+      echo "Deployment completed successfully!"
+  when: manual

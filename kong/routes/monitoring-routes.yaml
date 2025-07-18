@@ -1,0 +1,66 @@
+_format_version: "1.1"
+routes:
+  - name: monitoring-dashboard
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - GET
+    paths:
+      - /api/v1/monitoring/dashboard
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: monitoring-metrics
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - GET
+    paths:
+      - /api/v1/monitoring/metrics
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: monitoring-alerts
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - GET
+      - POST
+    paths:
+      - /api/v1/monitoring/alerts
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+
+  - name: monitoring-health
+    service: fleet-management-service
+    https_redirect_status_code: 426
+    methods:
+      - GET
+    paths:
+      - /api/v1/monitoring/health
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false

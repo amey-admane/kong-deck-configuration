@@ -1,0 +1,40 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Kong generated configuration - NOTE: Now tracked in git, generated locally with PS1 script
+# kong/kong.yaml
+
+.settings/
+.project
+.classpath
+.factorypath
+/backend/src/main/resources/application-local.yml
+/backend/.settings/
+/backend/.project
+/backend/.classpath
+
+# IDEs and editors
+.project
+.classpath
+.settings/
+
+
+
+# compiled output
+**/target
+**/dist
+/tmp
+
+
+# compiled output
+**/target
+**/dist
+/tmp
+
+# terraform
+# Ignore Terraform state files and directories
+*.tfstate
+*.tfstate.*
+*.tfvars   
+.terraform
+.terraform/*
+.terraform*

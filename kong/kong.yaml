@@ -1,0 +1,329 @@
+_format_version: "1.1"
+services:
+- write_timeout: 60000
+  read_timeout: 60000
+  connect_timeout: 60000
+  retries: 5
+  name: fleet-management-service
+  host: fleet-management-api.aws.example.com
+  port: 443
+  protocol: https
+  tags:
+  - fleet-management-service
+- write_timeout: 60000
+  path: /
+  read_timeout: 60000
+  connect_timeout: 60000
+  retries: 5
+  name: grafana-service
+  host: internal-grafana-internal-alb.eu-central-1.elb.amazonaws.com
+  port: 443
+  protocol: https
+  tags:
+  - grafana
+
+routes:
+# Fleet Management Routes
+- name: fleet-list
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - /api/v1/fleet/assets
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: fleet-asset-details
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - ~/api/v1/fleet/assets/[^/]+
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: fleet-asset-create
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - POST
+  paths:
+    - /api/v1/fleet/assets
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: fleet-asset-update
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - PUT
+    - PATCH
+  paths:
+    - ~/api/v1/fleet/assets/[^/]+
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: fleet-asset-delete
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - DELETE
+  paths:
+    - ~/api/v1/fleet/assets/[^/]+
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+# Monitoring Routes
+- name: monitoring-dashboard
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - /api/v1/monitoring/dashboard
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: monitoring-metrics
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - /api/v1/monitoring/metrics
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: monitoring-alerts
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+    - POST
+  paths:
+    - /api/v1/monitoring/alerts
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: monitoring-health
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - /api/v1/monitoring/health
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+# User Management Routes
+- name: user-profile
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+    - PUT
+  paths:
+    - /api/v1/users/profile
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: user-preferences
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+    - POST
+    - PUT
+  paths:
+    - /api/v1/users/preferences
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: user-notifications
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+    - POST
+  paths:
+    - /api/v1/users/notifications
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: user-activity
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - /api/v1/users/activity
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+# Reports Routes
+- name: reports-generate
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - POST
+  paths:
+    - /api/v1/reports/generate
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: reports-list
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - /api/v1/reports
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: reports-download
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - ~/api/v1/reports/[^/]+/download
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+- name: reports-status
+  service: fleet-management-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+  paths:
+    - ~/api/v1/reports/[^/]+/status
+  preserve_host: false
+  protocols:
+    - http
+    - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
+
+# Grafana Routes
+- name: grafana-root-path
+  service: grafana-service
+  https_redirect_status_code: 426
+  methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - PATCH
+    - OPTIONS
+    - HEAD
+  paths:
+    - /grafana
+  preserve_host: true
+  protocols:
+    - http
+    - https
+  regex_priority: 100
+  request_buffering: true
+  response_buffering: true
+  strip_path: false
